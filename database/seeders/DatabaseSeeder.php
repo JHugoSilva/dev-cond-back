@@ -56,13 +56,13 @@ class DatabaseSeeder extends Seeder
             'start_time'=>'09:00:00',
             'end_time'=>'23:00:00'
         ]);
-        DB::table('wall')->insert([
+        DB::table('walls')->insert([
             'title'=>'Título de Aviso Teste',
             'body'=>'Is simply dummy text of the printing and typesetting industry. 
             Lorem Ipsum has been the industry\'s standard dummy',
             'datecreated'=>'2021-11-03 15:00:00'
         ]);
-        DB::table('wall')->insert([
+        DB::table('walls')->insert([
             'title'=>'Título de Aviso Geral',
             'body'=>'Of type and scrambled it to make a type specimen book. It has survived not only five centuries.',
             'datecreated'=>'2021-11-05 13:00:00'
