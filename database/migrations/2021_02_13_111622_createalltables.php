@@ -27,7 +27,7 @@ class Createalltables extends Migration
             $table->integer('id_owner');
         });
 
-        Schema::create('unitpeople',function(Blueprint $table){
+        Schema::create('unitpeoples',function(Blueprint $table){
             $table->id();
             $table->integer('id_unit');
             $table->string('name');
