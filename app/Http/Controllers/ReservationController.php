@@ -81,6 +81,17 @@ class ReservationController extends Controller
                 $weekday = date('w', strtotime($date));
                 //VERIFICAR SE ESTÁ DENTRO DA DISPONIBILIDADE PADRAO
                 $allowedDays = explode(',',$area['days']);
+                if (!in_array($weekday, $allowedDays)) {
+                    $can = false;
+                } else {
+                    $start = strtotime($area['start_time']);
+                    $end = strtotime('- 1 hour', $area['end_time']);
+                    $revtime = strtotime($time);
+                    if($revtime < $start || $revtime > $end){
+                        $can = false;
+                    }
+                }
+                
                 if ($can) {
                     # code...
                 } else {
