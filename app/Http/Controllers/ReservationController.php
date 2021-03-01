@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Area;
 use App\Models\AreaDisabledDay;
 use App\Models\Reservation;
@@ -62,12 +63,17 @@ class ReservationController extends Controller
         return $array;
     }
     public function setReservation($id, Request $request){
-        $array=['error'=>''];
+        
+        $array=[
+            'error'=>''
+        ];
+
         $validator = Validator::make($request->all(), [
             'date' => 'required|date_format:Y-m-d',
             'time' => 'required|date_format:H:i:s',
             'property' => 'required'
         ]);
+
         if (!$validator->fails()) {
             $date = $request->input('date');
             $time = $request->input('time');
@@ -85,17 +91,34 @@ class ReservationController extends Controller
                     $can = false;
                 } else {
                     $start = strtotime($area['start_time']);
-                    $end = strtotime('- 1 hour', $area['end_time']);
+                    $end = strtotime('- 1 hour', strtotime($area['end_time']));
                     $revtime = strtotime($time);
                     if($revtime < $start || $revtime > $end){
                         $can = false;
                     }
                 }
-                
+                //Verifica se está dentro dos DisabledDays
+                $existingDisabledDay = AreaDisabledDay::where('id_area', $id)
+                ->where('day', $date)
+                ->count();
+                if($existingDisabledDay > 0){
+                    $can = false;
+                }
+                //Verifica se não existe outra reserva no mesmo dia/hora
+                $existingReservations = Reservation::where('id_area', $id)
+                ->where('reservation_date', $date.' '.$time)
+                ->count();
+                if($existingReservations > 0){
+                    $can = false;
+                }
                 if ($can) {
-                    # code...
+                    $newReservation = new Reservation();
+                    $newReservation->id_unit = $property;
+                    $newReservation->id_area = $id;
+                    $newReservation->reservation_date = $date.' '.$time;
+                    $newReservation->save();
                 } else {
-                   $array['error'] = 'Reserva não permitida neste dia/horário';
+                   $array['error'] = 'Reserva não permitida neste dia / horário';
                    return $array;
                 }
             } else {
@@ -105,6 +128,59 @@ class ReservationController extends Controller
         } else {
             $array['error'] = $validator->errors()->first();
             return $array;
+        }
+        return $array;
+    }
+    public function getDisabledDates($id){
+        $array=['error'=>'','list'=>[]];
+        $area = Area::find($id);
+        if ($area) {
+            //DIAS DISABLED PADRAO
+            $disableDays = AreaDisabledDay::where('id_area',$id)->get();
+            foreach($disableDays as $disableDay){
+                $array['list'][] = $disableDay['day'];
+            }
+            $allowedDays = explode(',', $area['days']);
+            $offDays = [];
+            for($q=0;$q<7;$q++){
+                if(!in_array($q, $allowedDays)){
+                    $offDays[] = $q;
+                }
+            }
+           //Listar os dias proibidos +3 meses pra frente
+           $start = time();
+           $end = strtotime('+3 months');
+           $current = $start;
+           $keep = true;
+           while($keep){
+            if($current < $end){
+                $wd = date('w', $current);
+                if(in_array($wd, $offDays)){
+                    $array['list'][] = date('Y-m-d', $current);
+                } 
+                $current = strtotime('+1 day', $current);
+            } else {
+                $keep = false;
+            }
+           }
+           print_r($end);
+        } else {
+            $array['error'] = 'Área inexistente';
+            return $array;
+        }
+        return $array;
+    }
+    public function getTimes($id, Request $request){
+        $array=['error'=>'','list'=>[]];
+        $validator = Validator::make($request->all(),[
+            'date'=>'required|date_format:Y-m-d'
+        ]);
+        if (!$validator->fails()) {
+            $date = $request->input('area');
+            $area = Area::find($id);
+        } else {
+           $array['error'] = $validator->errors()->first();
+           return $array;
         }
         return $array;
     }
