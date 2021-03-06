@@ -97,25 +97,29 @@ class ReservationController extends Controller
                         $can = false;
                     }
                 }
-<<<<<<< HEAD
+
                 //Verificar se está dentro dos DisableDays
-                $existingDisabledDay = AreaDisabledDay::where('id_area',$id)
-=======
+                $existingDisabledDay = AreaDisabledDay::where('id_area',$id);
+
+                //Verifica se está dentro dos DisabledDays
+                $existingDisabledDay = AreaDisabledDay::where('id_area', $id);
+
                 //Verifica se está dentro dos DisabledDays
                 $existingDisabledDay = AreaDisabledDay::where('id_area', $id)
->>>>>>> 70201fde81fdfa6bb0b87b6855ae01e3b23fa2e2
                 ->where('day', $date)
                 ->count();
                 if($existingDisabledDay > 0){
                     $can = false;
                 }
-<<<<<<< HEAD
+
                 //Verificar se não existe outra reserva no mesmo dia/hora
-                $existingReservations = Reservation::where('id_area',$id)
-=======
+                $existingReservations = Reservation::where('id_area',$id);
+
+                //Verifica se não existe outra reserva no mesmo dia/hora
+                $existingReservations = Reservation::where('id_area', $id);
+
                 //Verifica se não existe outra reserva no mesmo dia/hora
                 $existingReservations = Reservation::where('id_area', $id)
->>>>>>> 70201fde81fdfa6bb0b87b6855ae01e3b23fa2e2
                 ->where('reservation_date', $date.' '.$time)
                 ->count();
                 if($existingReservations > 0){
@@ -141,19 +145,9 @@ class ReservationController extends Controller
         }
         return $array;
     }
-<<<<<<< HEAD
-    public function getDisabledDates($id)
-    {
-        $array=['error'=>'','list'=>[]];
-        $area = Area::find($id);
-        if ($area) {
-            //Dias disabled padrao
-            $disabledDays = AreaDisabledDay::where('id_area',$id)->get();
-            foreach ($disabledDays as $disabledDay) {
-                $array['list'][] = $disabledDay['day'];
-            }
-            //Dias disabled através do allowed
-=======
+
+
+
     public function getDisabledDates($id){
         $array=['error'=>'','list'=>[]];
         $area = Area::find($id);
@@ -163,7 +157,7 @@ class ReservationController extends Controller
             foreach($disableDays as $disableDay){
                 $array['list'][] = $disableDay['day'];
             }
->>>>>>> 70201fde81fdfa6bb0b87b6855ae01e3b23fa2e2
+
             $allowedDays = explode(',', $area['days']);
             $offDays = [];
             for($q=0;$q<7;$q++){
@@ -171,7 +165,7 @@ class ReservationController extends Controller
                     $offDays[] = $q;
                 }
             }
-<<<<<<< HEAD
+
            //Listar os dias proibidos +3 meses para frente
            $start = time();
            $end = strtotime('+3 months');
@@ -183,7 +177,7 @@ class ReservationController extends Controller
                 if(in_array($wd, $offDays)){
                     $array['list'][] = date('Y-m-d',$current);
                 }
-=======
+
            //Listar os dias proibidos +3 meses pra frente
            $start = time();
            $end = strtotime('+3 months');
@@ -195,12 +189,12 @@ class ReservationController extends Controller
                 if(in_array($wd, $offDays)){
                     $array['list'][] = date('Y-m-d', $current);
                 } 
->>>>>>> 70201fde81fdfa6bb0b87b6855ae01e3b23fa2e2
+
                 $current = strtotime('+1 day', $current);
             } else {
                 $keep = false;
             }
-<<<<<<< HEAD
+
            }*/
            for($current=$start;$current<$end;$current=strtotime('+1 day', $current)){
                 $wd = date('w', $current);
@@ -212,16 +206,12 @@ class ReservationController extends Controller
            $array['error'] = 'Área inexistente';
            return $array;
         }
-        
-=======
-           }
+           
            print_r($end);
-        } else {
-            $array['error'] = 'Área inexistente';
-            return $array;
-        }
+        
         return $array;
     }
+    
     public function getTimes($id, Request $request){
         $array=['error'=>'','list'=>[]];
         $validator = Validator::make($request->all(),[
@@ -234,7 +224,6 @@ class ReservationController extends Controller
            $array['error'] = $validator->errors()->first();
            return $array;
         }
->>>>>>> 70201fde81fdfa6bb0b87b6855ae01e3b23fa2e2
         return $array;
     }
 }
