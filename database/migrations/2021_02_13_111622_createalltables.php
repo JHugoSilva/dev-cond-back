@@ -103,7 +103,7 @@ class Createalltables extends Migration
             $table->time('end_time');
         });
 
-        Schema::create('areasdisableddays',function(Blueprint $table){
+        Schema::create('areadisableddays',function(Blueprint $table){
             $table->id();
             $table->integer('id_area');
             $table->date('day');
